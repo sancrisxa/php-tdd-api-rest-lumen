@@ -5,6 +5,9 @@ use Laravel\Lumen\Testing\DatabaseTransactions;
 
 class UserTest extends TestCase
 {
+    use DatabaseTransactions;
+
+
     /**
      * A basic test example.
      *
@@ -14,12 +17,38 @@ class UserTest extends TestCase
     {
         $dados = [
             'name' => 'Nome 01',
-            'email' => 'email@email.com',
+            'email' => 'email01@email.com',
             'password' => '123',
         ];
 
         $this->post('/api/user', $dados);
 
         $this->assertResponseOK();
+
+        $resposta = (array) json_decode($this->response->content());
+
+        $this->assertArrayHasKey('name', $resposta);
+        $this->assertArrayHasKey('email', $resposta);
+        $this->assertArrayHasKey('id', $resposta);
     }
+
+    public function testViewUser()
+    {
+        $user = \App\User::first();
+
+        $this->get('/api/user/' . $user->id);
+
+        $this->assertResponseOk();
+
+
+        $resposta = (array) json_decode($this->response->content());
+
+        $this->assertArrayHasKey('name', $resposta);
+        $this->assertArrayHasKey('email', $resposta);
+        $this->assertArrayHasKey('id', $resposta);
+
+
+    }
+
+
 }
